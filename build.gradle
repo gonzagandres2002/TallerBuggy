@@ -1,0 +1,74 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
+plugins {
+	id 'io.github.jumosqu12.screenplayarchitecture' version '2.0.1'
+	id 'java'
+    id 'eclipse'
+    id 'idea'
+    // Reportes de Serenity BDD: agrega la tarea 'aggregate' (gradle clean test aggregate)
+    id 'net.serenity-bdd.serenity-gradle-plugin' version '4.1.10'
+}
+
+group 'co.edu.udea.certificacion.buggy'
+
+java {
+    // Compila y ejecuta las pruebas con Java 17, sin importar el JDK por defecto de la maquina
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    serenityVersion = '4.1.10'
+    serenityCucumberVersion = '4.1.10'
+    lombokVersion = '1.18.22'
+    junit = '4.13.2'
+    hamcrest = '1.3'
+    serenityWebVersion = '4.1.10'
+}
+
+dependencies {
+    implementation "net.serenity-bdd:serenity-core:$rootProject.ext.serenityVersion"
+    implementation "net.serenity-bdd:serenity-junit:$rootProject.ext.serenityVersion"
+    implementation "net.serenity-bdd:serenity-screenplay:$rootProject.ext.serenityVersion"
+    implementation "net.serenity-bdd:serenity-cucumber:$rootProject.ext.serenityCucumberVersion"
+    implementation 'org.slf4j:slf4j-simple:2.0.5'
+    implementation "net.serenity-bdd:serenity-screenplay-webdriver:$rootProject.ext.serenityWebVersion"
+
+    //Test compilation
+    testImplementation "junit:junit:$rootProject.ext.junit"
+    testImplementation "org.hamcrest:hamcrest-all:$rootProject.ext.hamcrest"
+    implementation 'org.slf4j:slf4j-simple:2.0.5'
+    testImplementation("io.github.bonigarcia:webdrivermanager:5.4.1")
+
+    //Lombok dependencies
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor  "org.projectlombok:lombok:${lombokVersion}"
+    testCompileOnly  "org.projectlombok:lombok:${lombokVersion}"
+
+    //Additional library
+    implementation group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.12.0'
+
+}
+
+tasks.named('test') {
+    // System configs
+    testLogging.showStandardStreams = true
+    // Permite pasar opciones por consola, ej: gradle test -Dheadless.mode=true
+    systemProperties System.getProperties().findAll { k, v ->
+        k.toString().startsWith('serenity.') || k.toString().startsWith('webdriver.') ||
+        k.toString().startsWith('headless.') || k.toString().startsWith('cucumber.')
+    }
+}
+
+// Genera el reporte aunque alguna prueba falle
+gradle.startParameter.continueOnFailure = true
+test.finalizedBy(aggregate)
