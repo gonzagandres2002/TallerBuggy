@@ -65,7 +65,8 @@ tasks.named('test') {
     // Permite pasar opciones por consola, ej: gradle test -Dheadless.mode=true
     systemProperties System.getProperties().findAll { k, v ->
         k.toString().startsWith('serenity.') || k.toString().startsWith('webdriver.') ||
-        k.toString().startsWith('headless.') || k.toString().startsWith('cucumber.')
+        k.toString().startsWith('headless.') || k.toString().startsWith('cucumber.') ||
+        k.toString().startsWith('demo.')
     }
 }
 

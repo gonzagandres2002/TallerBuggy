@@ -1,0 +1,40 @@
+# Pipeline generado con el scaffold (gradle gpl --name=TallerBuggy --type=azure) y adaptado:
+# - La plantilla original usaba el pool privado "Build" de Bancolombia, SonarQube y Java 11, y omitia las pruebas (-x test).
+# - Esta version corre en un agente hospedado de Azure DevOps con Java 17, ejecuta las pruebas E2E en modo
+#   headless y publica el reporte de Serenity BDD y los resultados JUnit en el pipeline.
+name: $(Build.SourceBranchName).$(date:yyyyMMdd)$(rev:.r)
+
+trigger:
+  branches:
+    include:
+      - main
+      - trunk
+      - feature/*
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+  - task: JavaToolInstaller@0
+    displayName: 'Install Java 17'
+    inputs:
+      versionSpec: '17'
+      jdkArchitectureOption: x64
+      jdkSourceOption: PreInstalled
+
+  - script: chmod +x gradlew && ./gradlew clean test aggregate -Dheadless.mode=true -Ddemo.delay.ms=0
+    displayName: 'Run E2E tests (Screenplay + Serenity BDD)'
+
+  - task: PublishTestResults@2
+    displayName: 'Publish JUnit results'
+    condition: always()
+    inputs:
+      testResultsFormat: JUnit
+      testResultsFiles: 'build/test-results/test/*.xml'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Serenity BDD report'
+    condition: always()
+    inputs:
+      PathtoPublish: 'target/site/serenity'
+      ArtifactName: 'serenity-report'
