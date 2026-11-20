@@ -34,11 +34,6 @@ public class User {
         return password;
     }
 
-    /** Copia del usuario con otra contrasena (escenarios de contrasena invalida o incorrecta). */
-    public User withPassword(String newPassword) {
-        return new User(login, firstName, lastName, newPassword);
-    }
-
     /** Nunca se imprime la contrasena: el toString aparece en logs y reportes. */
     @Override
     public String toString() {

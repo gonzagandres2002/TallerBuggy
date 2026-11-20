@@ -25,7 +25,7 @@ Ajustes que se le hicieron al arquetipo generado:
 | Problema del arquetipo | Ajuste |
 |---|---|
 | No incluye el plugin de reportes de Serenity, así que `aggregate` no existe | Se agregó `net.serenity-bdd.serenity-gradle-plugin` 4.1.10 |
-| El `glue` del Runner apuntaba a `...buggy.stepdefinitions` (le faltaba `rentacarros`) | Se corrigió en los 3 Runners |
+| El `glue` del Runner apuntaba a `...buggy.stepdefinitions` (le faltaba `rentacarros`) | Se corrigió en el Runner |
 | La URL de ejemplo era Google, como `swaglabsUrl` | Se cambió por `pages.buggyUrl` en `serenity.conf` |
 | El pipeline usaba el pool privado y el SonarQube de Bancolombia, y omitía las pruebas | Se adaptó a un agente hospedado de Azure que corre las pruebas y publica el reporte |
 
@@ -33,38 +33,32 @@ Ajustes que se le hicieron al arquetipo generado:
 
 ```
 src/main/java/co/edu/udea/certificacion/buggy/rentacarros/
-├── tasks/            Acciones de NEGOCIO: OpenTheBrowser, SignUp, AttemptToSignUp, SignIn, SelectTheCar, VoteForTheCar
+├── tasks/            Acciones de NEGOCIO: OpenTheBrowser, SignUp, SignIn, SelectTheCar, VoteForTheCar
 ├── interactions/     "La menuda": Authenticate, FillTheRegistrationForm, WriteTheComment, EnterSecretly
-├── questions/        Validaciones: TheMessage (String), TheRegisterButton (Boolean), TheComment (Boolean)
+├── questions/        Validaciones: TheMessage (String), TheComment (Boolean)
 ├── userinterfaces/   Targets por ID, NAME y XPATH: NavigationBar, RegisterPage, CarsPage
 ├── models/           User (objeto de negocio que viaja entre capas)
-├── exceptions/       CommentNotRegisteredError, UnexpectedMessageError (fallas funcionales)
+├── exceptions/       CommentNotRegisteredError (falla funcional)
 └── utils/            Wait (pausa para la sustentación), TestDataFactory (datos únicos), Constants
 src/test/java/.../
-├── runners/          RegisterUserRunner, LoginRunner, RateCarRunner
-└── stepdefinitions/  Hooks, CommonStepDefinitions, RegisterUserStepDefinitions, LoginStepDefinitions, RateCarStepDefinitions
+├── runners/          RateCarRunner
+└── stepdefinitions/  RateCarStepDefinitions (prepara el actor y define todos los pasos)
 src/test/resources/
-├── features/         register_user/, login/, rate_car/  (Gherkin en inglés, sin tildes)
+├── features/         rate_car/rate_car.feature  (Gherkin en inglés, sin tildes)
 └── serenity.conf     navegador, URL, capturas y espera implícita
 ```
 
 Así se lee la cadena: **Feature (Gherkin) → Runner → StepDefinition → Actor → Task (negocio) → Interaction (detalle) → Target (UI) → Question (validación)**.
 
-## 3. Escenarios (11)
+## 3. Escenarios: un feature, tres casos
 
-| Feature | Escenario | Tipo |
+Todo está en `rate_car.feature`. El `Background` abre la página de Buggy antes de cada caso.
+
+| Escenario | Qué hace | Tipo |
 |---|---|---|
-| Rate a car | E2E: registro, login, seleccionar Veneno, votar y comentar, validar el comentario | Camino feliz |
-| Rate a car | E2E: lo mismo con AVENTADOR (Scenario Outline + Examples) | Camino feliz |
-| Rate a car | Un visitante sin sesión no puede votar | Alterno |
-| Login | Login exitoso, saluda con el nombre | Camino feliz |
-| Login | Contraseña incorrecta | Excepcional |
-| Login | Login que no existe | Excepcional |
-| Register | Registro exitoso | Camino feliz |
-| Register | Contraseña de menos de 6 caracteres | Excepcional (límite) |
-| Register | Contraseña sin mayúsculas | Excepcional |
-| Register | Login ya registrado | Excepcional |
-| Register | Contraseñas que no coinciden: botón deshabilitado | Alterno |
+| E2E (Scenario Outline), ejemplo Veneno | Registro, login, seleccionar el auto, votar con comentario, validar el mensaje y el comentario | Camino feliz |
+| E2E (Scenario Outline), ejemplo AVENTADOR | Lo mismo con otro auto, gracias a `Examples` | Camino feliz |
+| Visitante sin sesión | Entra al auto sin iniciar sesión y el sitio le pide iniciar sesión para votar | Alterno |
 
 ## 4. Cómo ejecutar
 
@@ -83,7 +77,7 @@ Configuración: *Settings → Gradle → Gradle JVM = 17* y los plugins **Cucumb
 
 ## 5. Buenas prácticas aplicadas (para la sustentación)
 
-- **Principio FIRST.** Cada escenario es **independiente** y **repetible**: crea su propio usuario único en tiempo de ejecución (`TestDataFactory`), así que no depende de otros escenarios ni de datos previos. Todos terminan en una **Question**, lo que cumple con ser *testeable*.
+- **Principio FIRST.** Cada caso es **independiente** y **repetible**: cada E2E crea su propio usuario único en tiempo de ejecución (`TestDataFactory`), así que no depende de otros escenarios ni de datos previos. Todos terminan en una **Question**, lo que cumple con ser *testeable*.
 - **Seguridad:**
   - No hay credenciales reales ni contraseñas en el código ni en los `.feature`; se generan al vuelo.
   - La interacción `EnterSecretly` escribe las contraseñas sin que aparezcan en el reporte, donde se ven como `(******)`. `Enter.theValue` de Serenity sí las expondría.

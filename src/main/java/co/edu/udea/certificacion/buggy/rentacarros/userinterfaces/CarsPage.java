@@ -13,9 +13,7 @@ public final class CarsPage {
     public static final Target LNK_MODEL = Target.the("model {0} in the list of models")
             .locatedBy("//table[contains(@class,'cars')]//td/a[normalize-space()='{0}']");
 
-    public static final Target LBL_MODEL_NAME = Target.the("name of the selected model")
-            .locatedBy("//div[contains(@class,'row')]/h3");
-
+    // Localizado por ID
     public static final Target TXT_COMMENT = Target.the("comment field").located(By.id("comment"));
 
     public static final Target BTN_VOTE = Target.the("vote button")
@@ -25,6 +23,7 @@ public final class CarsPage {
     public static final Target LBL_VOTE_MESSAGE = Target.the("vote message")
             .locatedBy("//div[contains(@class,'card-block')]/p[contains(@class,'card-text')]");
 
+    /** Celda de la tabla de comentarios cuyo texto es exactamente {0}. */
     public static final Target CELL_COMMENT = Target.the("comment {0} in the comments table")
             .locatedBy("//table[contains(@class,'table')]//tbody/tr/td[3][normalize-space()='{0}']");
 

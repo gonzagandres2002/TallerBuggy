@@ -20,12 +20,6 @@ public final class RegisterPage {
     public static final Target LBL_SUCCESS = Target.the("registration success message")
             .locatedBy("//div[contains(@class,'result') and contains(@class,'alert-success')]");
 
-    public static final Target LBL_ERROR = Target.the("registration error message")
-            .locatedBy("//div[contains(@class,'result') and contains(@class,'alert-danger')]");
-
-    public static final Target LBL_CONFIRM_PASSWORD_ERROR = Target.the("password confirmation validation")
-            .locatedBy("//input[@id='confirmPassword']/following-sibling::div[contains(@class,'alert-danger')]");
-
     private RegisterPage() {
     }
 }

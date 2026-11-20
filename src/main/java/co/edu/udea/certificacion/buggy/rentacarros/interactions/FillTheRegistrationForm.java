@@ -18,12 +18,10 @@ import static co.edu.udea.certificacion.buggy.rentacarros.userinterfaces.Registe
 public class FillTheRegistrationForm implements Interaction {
 
     private final User user;
-    private final String passwordConfirmation;
     private final String login;
 
-    public FillTheRegistrationForm(User user, String passwordConfirmation) {
+    public FillTheRegistrationForm(User user) {
         this.user = user;
-        this.passwordConfirmation = passwordConfirmation;
         this.login = user.getLogin();
     }
 
@@ -38,15 +36,11 @@ public class FillTheRegistrationForm implements Interaction {
         Wait.aLittleBitTime();
         actor.attemptsTo(EnterSecretly.theValue(user.getPassword()).into(TXT_PASSWORD));
         Wait.aLittleBitTime();
-        actor.attemptsTo(EnterSecretly.theValue(passwordConfirmation).into(TXT_CONFIRM_PASSWORD));
+        actor.attemptsTo(EnterSecretly.theValue(user.getPassword()).into(TXT_CONFIRM_PASSWORD));
         Wait.aLittleBitTime();
     }
 
     public static FillTheRegistrationForm with(User user) {
-        return Tasks.instrumented(FillTheRegistrationForm.class, user, user.getPassword());
-    }
-
-    public static FillTheRegistrationForm withAConfirmationThatDoesNotMatch(User user) {
-        return Tasks.instrumented(FillTheRegistrationForm.class, user, user.getPassword() + "Different");
+        return Tasks.instrumented(FillTheRegistrationForm.class, user);
     }
 }

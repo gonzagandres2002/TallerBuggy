@@ -3,7 +3,7 @@ package co.edu.udea.certificacion.buggy.rentacarros.userinterfaces;
 import net.serenitybdd.screenplay.targets.Target;
 import org.openqa.selenium.By;
 
-/** Barra superior: formulario de login, enlace de registro y saludo del usuario. */
+/** Barra superior: formulario de login y enlaces de registro e inicio. */
 public final class NavigationBar {
 
     // Localizado por NAME
@@ -22,12 +22,6 @@ public final class NavigationBar {
 
     public static final Target LNK_HOME = Target.the("Buggy Rating home link")
             .locatedBy("//a[contains(@class,'navbar-brand')]");
-
-    public static final Target LBL_GREETING = Target.the("greeting of the signed in user")
-            .locatedBy("//span[contains(@class,'nav-link') and starts-with(normalize-space(),'Hi,')]");
-
-    public static final Target LBL_LOGIN_ERROR = Target.the("login error message")
-            .locatedBy("//span[contains(@class,'label-warning')]");
 
     private NavigationBar() {
     }
